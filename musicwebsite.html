@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moody - Your Music Journey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=1920') center/cover;
+            opacity: 0.25;
+            z-index: -1;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .now-playing {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .album-art {
+            width: 180px;
+            height: 180px;
+            border-radius: 15px;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .song-artist {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 1rem;
+            height: 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin: 3rem 0 1.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .artists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .artist-card {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .artist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .artist-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .artist-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .artist-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .playlist {
+            list-style: none;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .playlist-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .track-number {
+            font-weight: bold;
+            opacity: 0.7;
+            min-width: 25px;
+        }
+
+        .track-info {
+            flex: 1;
+        }
+
+        .track-title {
+            font-weight: 500;
+        }
+
+        .track-duration {
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        .preferences-section {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 3rem auto;
+            max-width: 800px;
+        }
+
+        .preference-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        select, input {
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        option {
+            background: #333;
+            color: #fff;
+        }
+
+        button {
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.5);
+        }
+
+        .recommendations {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(0, 255, 135, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #00ff87;
+            display: none;
+        }
+
+        .recommendations.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .recommendations h3 {
+            margin-bottom: 1rem;
+            color: #00ff87;
+        }
+
+        .recommendations ul {
+            list-style: none;
+        }
+
+        .recommendations li {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .now-playing {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .artists-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .song-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-overlay"></div>
+
+    <header>
+        <div class="logo">🎵 Moody</div>
+        <p class="tagline">Let The Music Take You Away</p>
+    </header>
+
+    <div class="container">
+        <div class="now-playing">
+            <img src="https://images.unsplash.com/photo-1549492423-400259a2e574?w=400" alt="Album Art" class="album-art">
+            <div class="song-info">
+                <div class="song-title">Midnight Dreams</div>
+                <div class="song-artist">The Weeknd</div>
+                <audio controls class="audio-player">
+                    <source src="" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+
+        <h2 class="section-title">✨ Top Artists Playlists</h2>
+        
+        <div class="artists-grid">
+            <div class="artist-card">
+                <div class="artist-header">
+                    <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200" alt="The Weeknd" class="artist-avatar">
+                    <div class="artist-name">The Weeknd</div>
+                </div>
+                <ul class="playlist">
+                    <li class="playlist-item">
+                        <span class="track-number">1</span>
+                        <div class="track-info">
+                            <div class="track-title">Blinding Lights</div>
+                            <div class="track-duration">3:20</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">2</span>
+                        <div class="track-info">
+                            <div class="track-title">Starboy</div>
+                            <div class="track-duration">3:50</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">3</span>
+                        <div class="track-info">
+                            <div class="track-title">Save Your Tears</div>
+                            <div class="track-duration">3:35</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">4</span>
+                        <div class="track-info">
+                            <div class="track-title">Die For You</div>
+                            <div class="track-duration">4:20</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="artist-card">
+                <div class="artist-header">
+                    <img src="https://images.unsplash.com/photo-1458560871784-56d23406c091?w=200" alt="Billie Eilish" class="artist-avatar">
+                    <div class="artist-name">Billie Eilish</div>
+                </div>
+                <ul class="playlist">
+                    <li class="playlist-item">
+                        <span class="track-number">1</span>
+                        <div class="track-info">
+                            <div class="track-title">bad guy</div>
+                            <div class="track-duration">3:14</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">2</span>
+                        <div class="track-info">
+                            <div class="track-title">Happier Than Ever</div>
+                            <div class="track-duration">4:58</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">3</span>
+                        <div class="track-info">
+                            <div class="track-title">everything i wanted</div>
+                            <div class="track-duration">4:05</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">4</span>
+                        <div class="track-info">
+                            <div class="track-title">Lovely</div>
+                            <div class="track-duration">3:20</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="artist-card">
+                <div class="artist-header">
+                    <img src="https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=200" alt="Ed Sheeran" class="artist-avatar">
+                    <div class="artist-name">Ed Sheeran</div>
+                </div>
+                <ul class="playlist">
+                    <li class="playlist-item">
+                        <span class="track-number">1</span>
+                        <div class="track-info">
+                            <div class="track-title">Shape of You</div>
+                            <div class="track-duration">3:53</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">2</span>
+                        <div class="track-info">
+                            <div class="track-title">Perfect</div>
+                            <div class="track-duration">4:23</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">3</span>
+                        <div class="track-info">
+                            <div class="track-title">Photograph</div>
+                            <div class="track-duration">4:18</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">4</span>
+                        <div class="track-info">
+                            <div class="track-title">Shivers</div>
+                            <div class="track-duration">3:27</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="artist-card">
+                <div class="artist-header">
+                    <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=200" alt="Dua Lipa" class="artist-avatar">
+                    <div class="artist-name">Dua Lipa</div>
+                </div>
+                <ul class="playlist">
+                    <li class="playlist-item">
+                        <span class="track-number">1</span>
+                        <div class="track-info">
+                            <div class="track-title">Levitating</div>
+                            <div class="track-duration">3:23</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">2</span>
+                        <div class="track-info">
+                            <div class="track-title">Don't Start Now</div>
+                            <div class="track-duration">3:03</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">3</span>
+                        <div class="track-info">
+                            <div class="track-title">New Rules</div>
+                            <div class="track-duration">3:29</div>
+                        </div>
+                    </li>
+                    <li class="playlist-item">
+                        <span class="track-number">4</span>
+                        <div class="track-info">
+                            <div class="track-title">Physical</div>
+                            <div class="track-duration">3:13</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="preferences-section">
+            <h2 class="section-title">🎯 Get Personalized Recommendations</h2>
+            <form class="preference-form" id="preferenceForm">
+                <div class="form-group">
+                    <label for="genre">Favorite Genre:</label>
+                    <select id="genre" name="genre">
+                        <option value="">Select a genre...</option>
+                        <option value="pop">Pop</option>
+                        <option value="rock">Rock</option>
+                        <option value="hip-hop">Hip-Hop</option>
+                        <option value="electronic">Electronic</option>
+                        <option value="r&b">R&B</option>
+                        <option value="indie">Indie</option>
+                        <option value="jazz">Jazz</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="mood">Current Mood:</label>
+                    <select id="mood" name="mood">
+                        <option value="">Select your mood...</option>
+                        <option value="energetic">Energetic</option>
+                        <option value="chill">Chill</option>
+                        <option value="romantic">Romantic</option>
+                        <option value="melancholic">Melancholic</option>
+                        <option value="happy">Happy</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="artist">Favorite Artist:</label>
+                    <input type="text" id="artist" name="artist" placeholder="Enter artist name...">
+                </div>
+
+                <button type="submit">🎼 Get Recommendations</button>
+            </form>
+
+            <div class="recommendations" id="recommendations">
+                <h3>🎵 Recommended Songs For You:</h3>
+                <ul id="recommendationList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const songDatabase = {
+            pop: {
+                energetic: ['Dynamite - BTS', 'Levitating - Dua Lipa', 'Blinding Lights - The Weeknd'],
+                chill: ['Circles - Post Malone', 'Someone You Loved - Lewis Capaldi'],
+                romantic: ['Perfect - Ed Sheeran', 'All of Me - John Legend'],
+                melancholic: ['Someone Like You - Adele', 'When We Were Young - Adele'],
+                happy: ['Happy - Pharrell Williams', 'Can\'t Stop the Feeling - Justin Timberlake']
+            },
+            rock: {
+                energetic: ['Seven Nation Army - The White Stripes', 'Thunderstruck - AC/DC'],
+                chill: ['Californication - Red Hot Chili Peppers', 'Wonderwall - Oasis'],
+                romantic: ['I Don\'t Want to Miss a Thing - Aerosmith', 'Iris - Goo Goo Dolls'],
+                melancholic: ['Hurt - Johnny Cash', 'Black - Pearl Jam'],
+                happy: ['Mr. Brightside - The Killers', 'Don\'t Stop Believin\' - Journey']
+            },
+            'hip-hop': {
+                energetic: ['Lose Yourself - Eminem', 'SICKO MODE - Travis Scott'],
+                chill: ['The Box - Roddy Ricch', 'Life is Good - Future'],
+                romantic: ['Best Part - Daniel Caesar', 'Location - Khalid'],
+                melancholic: ['Lucid Dreams - Juice WRLD', 'Moonlight - XXXTentacion'],
+                happy: ['Good Life - Kanye West', 'HUMBLE. - Kendrick Lamar']
+            },
+            electronic: {
+                energetic: ['Titanium - David Guetta', 'Animals - Martin Garrix'],
+                chill: ['Faded - Alan Walker', 'Clarity - Zedd'],
+                romantic: ['Something Just Like This - Chainsmokers', 'Closer - Chainsmokers'],
+                melancholic: ['Runaway - AURORA', 'Ocean Eyes - Billie Eilish'],
+                happy: ['Wake Me Up - Avicii', 'Summer - Calvin Harris']
+            },
+            'r&b': {
+                energetic: ['Yeah! - Usher', 'No Guidance - Chris Brown'],
+                chill: ['Location - Khalid', 'Earned It - The Weeknd'],
+                romantic: ['Adorn - Miguel', 'Say So - PJ Morton'],
+                melancholic: ['Self Control - Frank Ocean', 'Marvins Room - Drake'],
+                happy: ['Superstition - Stevie Wonder', 'Lovely Day - Bill Withers']
+            },
+            indie: {
+                energetic: ['Electric Feel - MGMT', 'Take a Walk - Passion Pit'],
+                chill: ['Holocene - Bon Iver', 'Bloom - The Paper Kites'],
+                romantic: ['First Day of My Life - Bright Eyes', 'Such Great Heights - The Postal Service'],
+                melancholic: ['Skinny Love - Bon Iver', 'Mad World - Gary Jules'],
+                happy: ['Home - Edward Sharpe', 'Dog Days Are Over - Florence']
+            },
+            jazz: {
+                energetic: ['Take Five - Dave Brubeck', 'Sing Sing Sing - Benny Goodman'],
+                chill: ['So What - Miles Davis', 'Blue in Green - Miles Davis'],
+                romantic: ['Fly Me to the Moon - Frank Sinatra', 'My Funny Valentine - Chet Baker'],
+                melancholic: ['Round Midnight - Thelonious Monk', 'Strange Fruit - Billie Holiday'],
+                happy: ['What a Wonderful World - Louis Armstrong', 'Feeling Good - Nina Simone']
+            }
+        };
+
+        document.getElementById('preferenceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const genre = document.getElementById('genre').value;
+            const mood = document.getElementById('mood').value;
+            const artist = document.getElementById('artist').value;
+            
+            if (!genre || !mood) {
+                alert('Please select both a genre and mood!');
+                return;
+            }
+            
+            const recommendations = songDatabase[genre][mood] || [];
+            const recList = document.getElementById('recommendationList');
+            const recSection = document.getElementById('recommendations');
+            
+            recList.innerHTML = '';
+            
+            if (recommendations.length > 0) {
+                recommendations.forEach(song => {
+                    const li = document.createElement('li');
+                    li.textContent = `🎵 ${song}`;
+                    recList.appendChild(li);
+                });
+                
+                if (artist) {
+                    const li = document.createElement('li');
+                    li.textContent = `🎵 Similar to ${artist}: Mix Playlist`;
+                    recList.appendChild(li);
+                }
+                
+                recSection.classList.add('show');
+            } else {
+                recList.innerHTML = '<li>No recommendations found. Try different preferences!</li>';
+                recSection.classList.add('show');
+            }
+        });
+
+        // Add click functionality to playlist items
+        document.querySelectorAll('.playlist-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const title = this.querySelector('.track-title').textContent;
+                alert(`Now playing: ${title}`);
+            });
+        });
+    </script>
+</body>
+</html>
